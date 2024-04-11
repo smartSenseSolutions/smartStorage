@@ -1,15 +1,15 @@
 package com.ss.smart_storage.util
 
-import android.os.Build
 import android.os.Environment
-import androidx.annotation.RequiresApi
 
-sealed class SmartDirectory{
-    companion object{
-        val INTERNAL : String = "Internal"
+
+ class SmartDirectory{
+    companion object {
+        const val INTERNAL: String = "Internal"
+        const val EXTERNAL_APP : String = "External_App"
     }
 
-    data object EXTERNAL : SmartDirectory() {
+    data object External {
         val music: String = Environment.DIRECTORY_MUSIC
         val podcasts: String = Environment.DIRECTORY_PODCASTS
         val ringtones: String = Environment.DIRECTORY_RINGTONES
@@ -20,12 +20,7 @@ sealed class SmartDirectory{
         val downloads: String = Environment.DIRECTORY_DOWNLOADS
         val dcim: String = Environment.DIRECTORY_DCIM
         val documents: String = Environment.DIRECTORY_DOCUMENTS
-
-        @RequiresApi(Build.VERSION_CODES.Q)
-        val audiobooks: String = Environment.DIRECTORY_AUDIOBOOKS
-
-        @RequiresApi(Build.VERSION_CODES.S)
-        val recordings: String = Environment.DIRECTORY_RECORDINGS
     }
 }
+
 
