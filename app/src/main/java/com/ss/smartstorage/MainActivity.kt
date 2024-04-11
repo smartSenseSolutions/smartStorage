@@ -7,11 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.ss.smart_storage.SmartStorage
-import com.ss.smart_storage.util.SmartDirectory
 import com.ss.smartstorage.ui.theme.SmartStorageTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -21,13 +20,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-                    val smartStorage = SmartStorage(context = applicationContext)
-                    smartStorage.store(
-                        location = SmartDirectory.EXTERNAL.downloads,
-                        fileData = byteArrayOf()
-                    )
-                    SmartStorageSample()
+                    SmartStorageSample(applicationContext , this)
                 }
             }
         }
