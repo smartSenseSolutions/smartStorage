@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(project(":smart-storage"))
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.documentfile)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
