@@ -5,5 +5,4 @@ import androidx.lifecycle.ViewModel
 
 class SmartStorageViewModel : ViewModel() {
     private val state = mutableIntStateOf(0)
-
 }
