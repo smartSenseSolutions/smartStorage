@@ -19,6 +19,8 @@ class MainActivity : ComponentActivity() {
 
         val smartStorage = SmartStorage(this)
 
+        val fileName = "testFile2"
+        val fileContent = "This is a test file"
 
         setContent {
             SmartStorageTheme {
@@ -26,16 +28,53 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SmartStorageSample(
-                        onStoreTap = {
-                            smartStorage.store(
-                                location = SmartDirectory.CUSTOM,
-                                fileName = "interstellar",
-                                fileType = SmartFileType.txt,
-                                fileData = "Directed by Christopher Nolan".toByteArray()
-                            )
-                        },
-                   )
+                        SmartStorageSample(
+                            onDownloadTap = {
+                                smartStorage.store(
+                                    location = SmartDirectory.DOWNLOADS,
+                                    fileName = fileName,
+                                    fileType = SmartFileType.txt,
+                                    fileData = fileContent.toByteArray()
+                                )
+                            },
+                            onDocumentTap = {
+                                smartStorage.store(
+                                    location = SmartDirectory.DOCUMENTS,
+                                    fileName = fileName,
+                                    fileType = SmartFileType.txt,
+                                    fileData = fileContent.toByteArray()
+                                )
+                            },
+                            onExternalAppTap = {
+                                smartStorage.store(
+                                    location = SmartDirectory.EXTERNAL_APP,
+                                    fileName = fileName,
+                                    fileType = SmartFileType.txt,
+                                    fileData = fileContent.toByteArray()
+                                )
+                            },
+                            onSAFTap = {
+                                smartStorage.store(
+                                    location = SmartDirectory.CUSTOM,
+                                    fileName = fileName,
+                                    fileType = SmartFileType.txt,
+                                    fileData = fileContent.toByteArray()
+                                )
+                            },
+                            onExternalStorageFolder = {
+                                smartStorage.store(
+                                    location = SmartDirectory.EXTERNAL,
+                                    fileName = fileName,
+                                    fileType = SmartFileType.txt,
+                                    fileData = fileContent.toByteArray()
+                                )
+                            },
+                            onPermissionGrant = {
+                                smartStorage.grantExternalStoragePermission()
+                            },
+
+                        )
+                }
                 }
             }
         }
@@ -44,5 +83,5 @@ class MainActivity : ComponentActivity() {
 
 
 
-}
+
 

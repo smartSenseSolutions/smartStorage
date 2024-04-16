@@ -9,14 +9,34 @@ import androidx.compose.ui.Alignment
 
 @Composable
 fun SmartStorageSample(
-    onStoreTap : () -> Unit,
+    onDownloadTap : () -> Unit,
+    onDocumentTap : () -> Unit,
+    onExternalAppTap : () -> Unit,
+    onSAFTap : () -> Unit,
+    onPermissionGrant : () -> Unit,
+    onExternalStorageFolder : () -> Unit,
 ){
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ElevatedButton(onClick = {onStoreTap()}) {
-        Text(text = "SAVE DUMMY") }
+        ElevatedButton(onClick = {onDownloadTap()}) {
+        Text(text = "Downloads") }
+
+        ElevatedButton(onClick = {onDocumentTap()}) {
+            Text(text = "Documents") }
+
+        ElevatedButton(onClick = {onExternalAppTap()}) {
+            Text(text = "External App Tap") }
+
+        ElevatedButton(onClick = {onSAFTap()}) {
+            Text(text = "SAF TAP") }
+
+        ElevatedButton(onClick = {onPermissionGrant()}) {
+            Text(text = "Grant WRITE Permission") }
+
+        ElevatedButton(onClick = {onExternalStorageFolder()}) {
+            Text(text = "External Storage Custom Foler") }
 
     }
 }

@@ -66,11 +66,18 @@ class SmartStorage(private val activity: ComponentActivity) {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            callFileDetails()
+           // callFileDetails()
+            Toast.makeText(activity, "Permission Granted", Toast.LENGTH_SHORT).show()
+
         } else {
             Toast.makeText(activity, "Permission denied", Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun grantExternalStoragePermission(){
+        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+
 
     private fun launchBaseDirectoryPicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
@@ -123,14 +130,19 @@ class SmartStorage(private val activity: ComponentActivity) {
             fileType = fileType,
             fileData = fileData
         )
-        isWritePermissionGranted()
+
+        callFileDetails()
+       // isWritePermissionGranted()
     }
 
     private fun storeToDirectory(fileDetails: FileDetails){
         val directory = handleFileCreation(fileDetails.location, activity.applicationContext)
 
         if(directory!=null && !directory.exists()){
-            directory.mkdirs()
+
+             val result =  directory.mkdirs()
+            Toast.makeText(activity, "Folder Creation Result $result", Toast.LENGTH_SHORT).show()
+
         }
 
         val file = File(
@@ -140,9 +152,13 @@ class SmartStorage(private val activity: ComponentActivity) {
         try {
             FileOutputStream(file).use { stream ->
                 stream.write(fileDetails.fileData)
+
+                Toast.makeText(activity, "File made successfully", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
+
+            Toast.makeText(activity, e.message.toString(), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -167,6 +183,7 @@ class SmartStorage(private val activity: ComponentActivity) {
         return when (location) {
             SmartDirectory.INTERNAL -> context.filesDir
             SmartDirectory.EXTERNAL_APP -> context.getExternalFilesDir(null)
+            SmartDirectory.EXTERNAL -> File(Environment.getExternalStorageDirectory() , "SmartStorage")
             else -> Environment.getExternalStoragePublicDirectory(location)
         }
     }
