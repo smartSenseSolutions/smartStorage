@@ -1,4 +1,4 @@
-bname: Android stage build
+name: Android stage build
 
 on:
   push:
