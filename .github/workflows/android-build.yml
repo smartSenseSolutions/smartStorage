@@ -1,4 +1,4 @@
-name: Android stage build
+bname: Android stage build
 
 on:
   push:
@@ -22,6 +22,6 @@ jobs:
       - name: Run with Gradle
         run: |
           ./gradlew clean
-          ./gradlew bundleStage
+          ./gradlew bundleDebug
 
           
