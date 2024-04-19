@@ -30,9 +30,9 @@ class MainActivity : ComponentActivity() {
                         onStoreTap = {
                             smartStorage.store(
                                 location = SmartDirectory.CUSTOM,
-                                fileName = "interstellar",
+                                fileName = "github_actions",
                                 fileType = SmartFileType.txt,
-                                fileData = "Directed by Christopher Nolan".toByteArray()
+                                fileData = "These are the push files for Github Actions. Something epic will happen here".toByteArray()
                             )
                         },
                    )
