@@ -1,19 +1,15 @@
 package com.ss.smart_storage
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
+import com.ss.smart_storage.util.PermissionStatus
 import com.ss.smart_storage.util.SmartDirectory
 import com.ss.smart_storage.util.SmartFileType
 import java.io.File
@@ -43,71 +39,60 @@ class SmartStorage(private val activity: ComponentActivity) {
 
 
     private var baseDocumentTreeUri: Uri? = null
-    private var fileDetails : FileDetails? = null
+    private var fileDetails: FileDetails? = null
 
 
-    private val safLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val uri: Uri? = result.data?.data
-            if (uri != null) {
-                baseDocumentTreeUri = uri
-                if(fileDetails!=null){
-                    writeFileToDocumentTree(
-                        baseDocumentTreeUri,
-                        fileDetails!!.name,
-                        fileDetails!!.fileData,
-                    )
+   private val  permissionManager = PermissionManager(
+       activity = activity,
+    onPermissionGranted = { status ->
+        when (status) {
+            PermissionStatus.NOT_NEEDED -> {
+                callFileDetails()
+            }
+
+            PermissionStatus.ACCEPTED -> {
+                callFileDetails()
+            }
+
+            PermissionStatus.DENIED -> {
+                Toast.makeText(activity, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+
+            PermissionStatus.NOT_APPLICABLE -> {
+                launchBaseDirectoryPicker()
+            }
+
+            PermissionStatus.NOT_AVAILABLE -> {
+                Toast.makeText(activity, "Feature not Available", Toast.LENGTH_SHORT).show()
+            }
+
+            PermissionStatus.REDIRECT_TO_SETTINGS -> {
+                //Redirection
+            }
+        }
+    })
+
+
+    private val safLauncher =
+        activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val uri: Uri? = result.data?.data
+                if (uri != null) {
+                    baseDocumentTreeUri = uri
+                    if (fileDetails != null) {
+                        writeFileToDocumentTree(
+                            baseDocumentTreeUri,
+                            fileDetails!!.name,
+                            fileDetails!!.fileData,
+                        )
+                    }
                 }
             }
         }
-    }
-
-    private val requestPermissionLauncher = activity.registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            callFileDetails()
-        } else {
-            Toast.makeText(activity, "Permission denied", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun launchBaseDirectoryPicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         safLauncher.launch(intent)
-    }
-
-
-//todo : Remove Supress Lint
-    @SuppressLint("ObsoleteSdkInt")
-    fun isWritePermissionGranted(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(
-                    activity,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                callFileDetails()
-            } else {
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        } else {
-            callFileDetails()
-        }
-    }
-
-    private fun callFileDetails(){
-        if(fileDetails != null){
-            if(fileDetails!!.location == SmartDirectory.CUSTOM){
-                launchBaseDirectoryPicker()
-            }
-
-            else{
-                storeToDirectory(
-                    fileDetails = fileDetails!!
-                )
-            }
-        }
     }
 
 
@@ -118,18 +103,26 @@ class SmartStorage(private val activity: ComponentActivity) {
             if (!fileName.isNullOrEmpty()) "$fileName.$fileType" else "smartStorage.${fileType.name}"
 
         fileDetails = FileDetails(
-            name = name,
-            location = location,
-            fileType = fileType,
-            fileData = fileData
+            name = name, location = location, fileType = fileType, fileData = fileData
         )
-        isWritePermissionGranted()
+
+        permissionManager.checkLocation(location)
     }
 
-    private fun storeToDirectory(fileDetails: FileDetails){
+
+    private fun callFileDetails() {
+        if (fileDetails != null) {
+            storeToDirectory(
+                fileDetails = fileDetails!!
+            )
+        }
+    }
+
+
+    private fun storeToDirectory(fileDetails: FileDetails) {
         val directory = handleFileCreation(fileDetails.location, activity.applicationContext)
 
-        if(directory!=null && !directory.exists()){
+        if (directory != null && !directory.exists()) {
             directory.mkdirs()
         }
 
@@ -146,12 +139,18 @@ class SmartStorage(private val activity: ComponentActivity) {
         }
     }
 
-    private fun writeFileToDocumentTree(baseDocumentTreeUri: Uri?, fileName: String, content: ByteArray) {
+    private fun writeFileToDocumentTree(
+        baseDocumentTreeUri: Uri?, fileName: String, content: ByteArray
+    ) {
         baseDocumentTreeUri?.let { treeUri ->
             try {
                 val directory = DocumentFile.fromTreeUri(activity.applicationContext, treeUri)
                 val file = directory?.createFile("text/*", fileName)
-                val pfd = file?.let { activity.applicationContext.contentResolver.openFileDescriptor(it.uri, "w") }
+                val pfd = file?.let {
+                    activity.applicationContext.contentResolver.openFileDescriptor(
+                        it.uri, "w"
+                    )
+                }
                 pfd?.use { descriptor ->
                     val fos = FileOutputStream(descriptor.fileDescriptor)
                     fos.write(content)
@@ -166,7 +165,8 @@ class SmartStorage(private val activity: ComponentActivity) {
     private fun handleFileCreation(location: String, context: Context): File? {
         return when (location) {
             SmartDirectory.INTERNAL -> context.filesDir
-            SmartDirectory.EXTERNAL_APP -> context.getExternalFilesDir(null)
+            SmartDirectory.EXTERNAL_PUBLIC -> Environment.getExternalStoragePublicDirectory("SmartStorage")
+            SmartDirectory.SCOPED_STORAGE -> context.getExternalFilesDir(null)
             else -> Environment.getExternalStoragePublicDirectory(location)
         }
     }
