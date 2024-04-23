@@ -1,8 +1,10 @@
 package com.ss.smartstorage
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -14,6 +16,7 @@ import com.ss.smartstorage.ui.theme.SmartStorageTheme
 
 class MainActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,8 +32,8 @@ class MainActivity : ComponentActivity() {
                     SmartStorageSample(
                         onStoreTap = {
                             smartStorage.store(
-                                location = SmartDirectory.CUSTOM,
-                                fileName = "interstellar",
+                                location = SmartDirectory.EXTERNAL_PUBLIC,
+                                fileName = "abc",
                                 fileType = SmartFileType.txt,
                                 fileData = "Directed by Christopher Nolan".toByteArray()
                             )
