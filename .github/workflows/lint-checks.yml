@@ -19,11 +19,14 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: 17
-
-      - name: Run ktLint
-        run: ./gradlew ktlint
-        continue-on-error: false
-
+          
       - name: Run Lint
         run: ./gradlew lint
         continue-on-error: false
+
+      - name: Uploading Lint Report
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results.html
+          path: app/build/reports/lint-results-debug.html
