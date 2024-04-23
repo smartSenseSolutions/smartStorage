@@ -9,6 +9,7 @@ git *.iml
 /.idea/sonarlint
 /.idea/assetWizardSettings.xml
 .DS_Store
+./idea/
 /build
 /captures
 .externalNativeBuild
