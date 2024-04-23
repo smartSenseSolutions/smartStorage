@@ -32,8 +32,8 @@ class MainActivity : ComponentActivity() {
                     SmartStorageSample(
                         onStoreTap = {
                             smartStorage.store(
-                                location = SmartDirectory.EXTERNAL_PUBLIC,
-                                fileName = "abc",
+                                location = SmartDirectory.DOWNLOADS,
+                                fileName = "dd",
                                 fileType = SmartFileType.txt,
                                 fileData = "Directed by Christopher Nolan".toByteArray()
                             )
