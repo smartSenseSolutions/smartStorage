@@ -1,0 +1,29 @@
+name: Android Lint
+run-name: Running Android Lint
+
+on:
+  pull_request:
+    branches:
+      - 'development'
+
+jobs:
+  android-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Java SDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: 17
+
+      - name: Run ktLint
+        run: ./gradlew ktlint
+        continue-on-error: false
+
+      - name: Run Lint
+        run: ./gradlew lint
+        continue-on-error: false
