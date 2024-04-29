@@ -1,10 +1,15 @@
 package com.ss.smart_storage
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.ss.smart_storage.util.PermissionStatus
 import com.ss.smart_storage.util.SmartDirectory
@@ -14,8 +19,6 @@ class PermissionManager(
     private val activity: ComponentActivity,
     val onPermissionGranted: (PermissionStatus) -> Unit
 ) {
-
-
     private val requestPermissionLauncher = activity.registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -26,11 +29,9 @@ class PermissionManager(
         }
     }
 
-
-
-
     fun checkLocation(location: String) {
         when (location) {
+
             SmartDirectory.CUSTOM -> {
                 onPermissionGranted(PermissionStatus.NOT_APPLICABLE)
             }
@@ -55,13 +56,10 @@ class PermissionManager(
                 checkOsForPermissions(location)
             }
         }
-
     }
 
     private fun checkOsForPermissions(location: String) {
-
         if (isVersionInBetween(Build.VERSION_CODES.M, Build.VERSION_CODES.Q)) {
-
             checkIfPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 onPermissionGranted = {
                     onPermissionGranted(PermissionStatus.ACCEPTED)
@@ -70,13 +68,14 @@ class PermissionManager(
                 Build.VERSION_CODES.R, Build.VERSION_CODES.S
             ) && location == SmartDirectory.EXTERNAL_PUBLIC
         ) {
-            checkIfManagePermissionGranted(Manifest.permission.MANAGE_EXTERNAL_STORAGE ,
-                onPermissionGranted = {
-                    granted ->
-                    if(granted)  onPermissionGranted(PermissionStatus.ACCEPTED)
-                    else onPermissionGranted(PermissionStatus.REDIRECT_TO_SETTINGS)
-                })
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                checkIfManagePermissionGranted(Manifest.permission.MANAGE_EXTERNAL_STORAGE ,
+                    onPermissionGranted = {
+                        granted ->
+                        if(granted)  onPermissionGranted(PermissionStatus.ACCEPTED)
+                        else onPermissionGranted(PermissionStatus.REDIRECT_TO_SETTINGS)
+                    })
+            }
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && location == SmartDirectory.EXTERNAL_PUBLIC) {
             onPermissionGranted(PermissionStatus.NOT_AVAILABLE)
@@ -84,6 +83,7 @@ class PermissionManager(
             onPermissionGranted(PermissionStatus.ACCEPTED)
         }
     }
+
 
     private fun checkIfPermissionGranted(permission: String, onPermissionGranted: () -> Unit) {
         if (ContextCompat.checkSelfPermission(
@@ -106,6 +106,8 @@ class PermissionManager(
             onPermissionGranted(false)
         }
     }
+
+
 
 
     private fun isVersionInBetween(min: Int, max: Int): Boolean {

@@ -1,7 +1,9 @@
 package com.ss.smartstorage
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -16,7 +18,7 @@ import com.ss.smartstorage.ui.theme.SmartStorageTheme
 
 class MainActivity : ComponentActivity() {
 
-    @RequiresApi(Build.VERSION_CODES.R)
+    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,9 +35,9 @@ class MainActivity : ComponentActivity() {
                         onStoreTap = {
                             smartStorage.store(
                                 location = SmartDirectory.DOWNLOADS,
-                                fileName = "dd",
-                                fileType = SmartFileType.txt,
-                                fileData = "Directed by Christopher Nolan".toByteArray()
+                                fileType = SmartFileType.TXT,
+                                fileName = "SampleFile.txt",
+                                fileData = "This is a sample txt file.".toByteArray()
                             )
                         },
                    )

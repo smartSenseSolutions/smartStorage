@@ -1,14 +1,19 @@
 package com.ss.smart_storage
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.documentfile.provider.DocumentFile
+import com.ss.smart_storage.model.FileDetails
 import com.ss.smart_storage.util.PermissionStatus
 import com.ss.smart_storage.util.SmartDirectory
 import com.ss.smart_storage.util.SmartFileType
@@ -17,60 +22,50 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
-data class FileDetails(
-    val name: String,
-    val location: String,
-    val fileType: SmartFileType,
-    val fileData: ByteArray,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as FileDetails
-        return fileData.contentEquals(other.fileData)
-    }
-
-    override fun hashCode(): Int {
-        return fileData.contentHashCode()
-    }
-}
-
 class SmartStorage(private val activity: ComponentActivity) {
 
-
     private var baseDocumentTreeUri: Uri? = null
-    private var fileDetails: FileDetails? = null
+    private lateinit var fileDetails: FileDetails
 
 
-   private val  permissionManager = PermissionManager(
-       activity = activity,
-    onPermissionGranted = { status ->
-        when (status) {
-            PermissionStatus.NOT_NEEDED -> {
-                callFileDetails()
+    @SuppressLint("NewApi")
+    private val permissionManager =
+        PermissionManager(activity = activity, onPermissionGranted = { status ->
+
+            when (status) {
+                PermissionStatus.NOT_NEEDED -> {
+                    callFileDetails()
+                }
+
+                PermissionStatus.ACCEPTED -> {
+                    callFileDetails()
+                }
+
+                PermissionStatus.DENIED -> {
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.perm_denied),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                PermissionStatus.NOT_APPLICABLE -> {
+                    launchBaseDirectoryPicker()
+                }
+
+                PermissionStatus.NOT_AVAILABLE -> {
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.feature_not_available),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                PermissionStatus.REDIRECT_TO_SETTINGS -> {
+                    requestFullStorageAccess()
+                }
             }
-
-            PermissionStatus.ACCEPTED -> {
-                callFileDetails()
-            }
-
-            PermissionStatus.DENIED -> {
-                Toast.makeText(activity, "Permission Denied", Toast.LENGTH_SHORT).show()
-            }
-
-            PermissionStatus.NOT_APPLICABLE -> {
-                launchBaseDirectoryPicker()
-            }
-
-            PermissionStatus.NOT_AVAILABLE -> {
-                Toast.makeText(activity, "Feature not Available", Toast.LENGTH_SHORT).show()
-            }
-
-            PermissionStatus.REDIRECT_TO_SETTINGS -> {
-                //Redirection
-            }
-        }
-    })
+        })
 
 
     private val safLauncher =
@@ -79,13 +74,9 @@ class SmartStorage(private val activity: ComponentActivity) {
                 val uri: Uri? = result.data?.data
                 if (uri != null) {
                     baseDocumentTreeUri = uri
-                    if (fileDetails != null) {
-                        writeFileToDocumentTree(
-                            baseDocumentTreeUri,
-                            fileDetails!!.name,
-                            fileDetails!!.fileData,
-                        )
-                    }
+                    writeFileToDocumentTree(
+                        baseDocumentTreeUri,
+                    )
                 }
             }
         }
@@ -95,12 +86,18 @@ class SmartStorage(private val activity: ComponentActivity) {
         safLauncher.launch(intent)
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun requestFullStorageAccess(){
+        activity.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+    }
+
 
     fun store(
         location: String, fileName: String? = null, fileType: SmartFileType, fileData: ByteArray
     ) {
+
         val name =
-            if (!fileName.isNullOrEmpty()) "$fileName.$fileType" else "smartStorage.${fileType.name}"
+            if(fileName.isNullOrEmpty()) randomFileName(fileType.extension) else fileName.plus(fileType.extension)
 
         fileDetails = FileDetails(
             name = name, location = location, fileType = fileType, fileData = fileData
@@ -111,11 +108,17 @@ class SmartStorage(private val activity: ComponentActivity) {
 
 
     private fun callFileDetails() {
-        if (fileDetails != null) {
-            storeToDirectory(
-                fileDetails = fileDetails!!
-            )
-        }
+        storeToDirectory(
+            fileDetails = fileDetails
+        )
+    }
+
+    private fun randomFileName(extension : String): String {
+        val alphanumericChars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        val randomString = (1..8)
+            .map { alphanumericChars.random() }
+            .joinToString("")
+        return randomString.plus(extension)
     }
 
 
@@ -140,12 +143,13 @@ class SmartStorage(private val activity: ComponentActivity) {
     }
 
     private fun writeFileToDocumentTree(
-        baseDocumentTreeUri: Uri?, fileName: String, content: ByteArray
+        baseDocumentTreeUri: Uri?
     ) {
         baseDocumentTreeUri?.let { treeUri ->
             try {
                 val directory = DocumentFile.fromTreeUri(activity.applicationContext, treeUri)
-                val file = directory?.createFile("text/*", fileName)
+                val file =
+                    directory?.createFile(fileDetails.fileType.mimeType, fileDetails.fileType.name)
                 val pfd = file?.let {
                     activity.applicationContext.contentResolver.openFileDescriptor(
                         it.uri, "w"
@@ -153,7 +157,7 @@ class SmartStorage(private val activity: ComponentActivity) {
                 }
                 pfd?.use { descriptor ->
                     val fos = FileOutputStream(descriptor.fileDescriptor)
-                    fos.write(content)
+                    fos.write(fileDetails.fileData)
                     fos.close()
                 }
             } catch (e: IOException) {
@@ -165,11 +169,17 @@ class SmartStorage(private val activity: ComponentActivity) {
     private fun handleFileCreation(location: String, context: Context): File? {
         return when (location) {
             SmartDirectory.INTERNAL -> context.filesDir
-            SmartDirectory.EXTERNAL_PUBLIC -> Environment.getExternalStoragePublicDirectory("SmartStorage")
+            SmartDirectory.EXTERNAL_PUBLIC -> Environment.getExternalStoragePublicDirectory(
+                getPackage()
+            )
+
             SmartDirectory.SCOPED_STORAGE -> context.getExternalFilesDir(null)
             else -> Environment.getExternalStoragePublicDirectory(location)
         }
     }
+
+    private fun getPackage(): String = activity.packageName.substringAfterLast('.')
+
 
 }
 
