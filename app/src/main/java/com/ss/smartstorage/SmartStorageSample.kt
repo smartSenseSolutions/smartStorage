@@ -134,9 +134,6 @@ fun SmartStorageSample(
 
                 }
 
-
-
-
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Column(
