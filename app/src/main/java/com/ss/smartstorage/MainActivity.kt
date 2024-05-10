@@ -29,14 +29,14 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     SmartStorageSample(
-                        onStoreTap = {
-                            smartStorage.store(
-                                location = SmartDirectory.DOWNLOADS,
-                                fileType = SmartFileType.TXT,
-                                fileName = "SampleFile.txt",
-                                fileData = "This is a sample txt file.".toByteArray()
-                            )
-                        },
+                        onStoreTap = { fileName, fileType, location ->
+                                smartStorage.store(
+                                    location = location,
+                                    fileType = fileType,
+                                    fileName = fileName,
+                                    fileData = "This is a sample txt file.".toByteArray()
+                                )
+                        }
                    )
                 }
             }

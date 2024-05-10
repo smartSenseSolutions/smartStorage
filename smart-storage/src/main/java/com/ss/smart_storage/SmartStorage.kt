@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
@@ -132,7 +133,7 @@ class SmartStorage(private val activity: ComponentActivity) {
         val file = File(
             directory, fileDetails.name
         )
-
+        Log.d("Path to directory:", directory!!.path)
         try {
             FileOutputStream(file).use { stream ->
                 stream.write(fileDetails.fileData)
