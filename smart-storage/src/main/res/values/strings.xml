@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="perm_denied">Permission Denied</string>
-    <string name="feature_not_available">Feature not Available</string>
-
-</resources>
