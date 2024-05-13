@@ -54,14 +54,6 @@ class SmartStorage(private val activity: ComponentActivity) {
                     launchBaseDirectoryPicker()
                 }
 
-                PermissionStatus.NOT_AVAILABLE -> {
-                    Toast.makeText(
-                        activity,
-                        activity.getString(R.string.feature_not_available),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
                 PermissionStatus.REDIRECT_TO_SETTINGS -> {
                     requestFullStorageAccess()
                 }
