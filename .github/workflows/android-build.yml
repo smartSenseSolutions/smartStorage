@@ -20,6 +20,13 @@ jobs:
           distribution: 'adopt'
           java-version: 17
 
+      - name: Decode secret properties
+        env:
+          SECRET_PROPERTIES_BASE64: ${{ secrets.SECRET_PROPERTIES }}
+        run: |
+          echo -n "$SECRET_PROPERTIES_BASE64" | base64 --decode > ${{ github.workspace }}/app/src/main/secret.properties
+          echo -n "$SECRET_PROPERTIES_BASE64" | base64 --decode > ${{ github.workspace }}/data/src/main/secret.properties
+
       - name: Run with Gradle
         run: |
           ./gradlew clean
