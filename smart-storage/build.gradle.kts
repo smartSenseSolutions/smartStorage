@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.rootPublicationComponentName
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -51,7 +50,7 @@ android {
 
 publishing {
     val githubProperties = Properties()
-    githubProperties.load(FileInputStream(rootProject.file("github.properties")))
+    githubProperties.load(FileInputStream(rootProject.file("secret.properties")))
 
     repositories {
         maven {
