@@ -16,10 +16,6 @@ val getArtifactId = { ->
     "com.ss.smart-storage" // Replace with library name ID
 }
 
-val githubProperties = Properties()
-githubProperties.load(FileInputStream(rootProject.file("github.properties")))
-
-
 android {
     namespace = "com.ss.smart-storage"
     compileSdk = 34
@@ -54,6 +50,9 @@ android {
 }
 
 publishing {
+    val githubProperties = Properties()
+    githubProperties.load(FileInputStream(rootProject.file("github.properties")))
+
     repositories {
         maven {
             name = "GitHubPackages"
