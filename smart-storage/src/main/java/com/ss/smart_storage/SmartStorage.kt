@@ -142,7 +142,7 @@ class SmartStorage(private val activity: ComponentActivity) {
             try {
                 val directory = DocumentFile.fromTreeUri(activity.applicationContext, treeUri)
                 val file =
-                    directory?.createFile(fileDetails.fileType.mimeType, fileDetails.fileType.name)
+                    directory?.createFile(fileDetails.fileType.mimeType, fileDetails.name)
                 val pfd = file?.let {
                     activity.applicationContext.contentResolver.openFileDescriptor(
                         it.uri, "w"
