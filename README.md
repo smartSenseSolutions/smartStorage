@@ -5,7 +5,9 @@
 
 File storage management in Android can be a complex task, requiring developers to handle various permissions, file paths, and platform-specific constraints. The Smart Storage library aims to simplify this process by providing a unified and streamlined approach to file storage, reducing development time and increasing code maintainability.
 
+## Demo
 
+![Preview](https://github.com/smartSenseSolutions/smartStorage/blob/development/preview/preview.gif)
 
 ## Usage
 
