@@ -27,7 +27,11 @@ class SmartStorage(private val activity: ComponentActivity) {
 
     private var baseDocumentTreeUri: Uri? = null
     private lateinit var fileDetails: FileDetails
+    private var listener: OutputListener? = null
 
+    fun registerListener(listener: OutputListener) {
+        this.listener = listener
+    }
 
     @SuppressLint("NewApi")
     private val permissionManager =
@@ -130,8 +134,10 @@ class SmartStorage(private val activity: ComponentActivity) {
             FileOutputStream(file).use { stream ->
                 stream.write(fileDetails.fileData)
             }
+            listener?.onSuccess(file.path)
         } catch (e: Exception) {
             e.printStackTrace()
+            listener?.onFail(e.message)
         }
     }
 
