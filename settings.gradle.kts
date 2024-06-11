@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SmartStorage"
+rootProject.name = "SmartStorageDemo"
 include(":app")
-include(":smartStorage")
+include(":smartstorage")
