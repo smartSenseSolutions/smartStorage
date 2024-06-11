@@ -9,6 +9,23 @@ File storage management in Android can be a complex task, requiring developers t
 
 ![Preview](https://github.com/smartSenseSolutions/smartStorage/blob/development/preview/preview.gif)
 
+## Setup
+
+Add the Maven Central repository to your project's root ```build.gradle``` file
+``` gradle
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+```
+
+Add the dependency in your app ```build.gradle``` file:
+``` gradle
+implementation 'io.github.smartsensesolutions:smartStorage:1.0.0'
+
+```
+
 ## Usage
 
 Sample implementation [here](https://github.com/smartSenseSolutions/smartStorage/tree/main/app)
