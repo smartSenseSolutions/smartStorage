@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ss.smartstorage"
+    namespace = "com.ss.smartstoragedemo"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ss.smartstorage"
+        applicationId = "com.ss.smartstoragedemo"
         minSdk = 23
         targetSdk = 34
         versionCode = 1
@@ -60,7 +60,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.coil.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(project(":smart-storage"))
+    implementation(project(":smartStorage"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.documentfile)
     testImplementation(libs.junit)
@@ -70,10 +70,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-
-
-    project(":smart-storage")
-
-
 }

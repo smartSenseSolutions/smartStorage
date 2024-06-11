@@ -13,6 +13,7 @@ appcompat = "1.6.1"
 lifecycleViewmodelCompose = "2.7.0"
 material = "1.11.0"
 documentfile = "1.0.1"
+nexusPublish = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,4 +40,5 @@ androidx-documentfile = { group = "androidx.documentfile", name = "documentfile"
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+nexusPublish = {id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish"}
 
